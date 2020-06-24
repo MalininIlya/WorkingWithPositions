@@ -15,7 +15,6 @@ int workingFile() {
 	cout << "Нажмите 5 для выхода из программы" << endl << endl;
 
 	cin >> choice;
-	cout << endl;
 
 	if (choice == "1")												 // проверка введенного значения на корректность
 		return 1;	
@@ -28,7 +27,7 @@ int workingFile() {
 	else if (choice == "5")
 		return 5;
 	else{
-		cout << "Выберите один из вариантов" << endl;
+		cout << "Выберите один из вариантов" << endl << endl;
 		workingFile();												// повторный вызов функции при некоретном значения
 	}
 }
