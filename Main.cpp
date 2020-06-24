@@ -32,7 +32,7 @@ int workingFile() {
 	cout << "Нажмите 4 для текстового поиска позиции" << endl;
 	cout << "Нажмите 5 для выхода из программы с сохранением данных" << endl << endl;
 
-	getline(cin,choice);
+	getline(cin, choice);
 	cout << endl;
 
 	if (choice == "1")												 // проверка введенного значения на корректность
@@ -57,28 +57,33 @@ int main() {
 	SetConsoleOutputCP(1251);
 
 	fstream file;
-	file.open("data.txt", fstream::in | fstream::out | fstream::app); // открытие файла с параметрами ввода, вывода данных, а также 
-																	  // добавление в текущие данные, не затирая предыдущие
+	list<Element> positions;
 
-	if (!file.is_open())											
-		cout << "Ошибка открытие файла!"<<endl;
+	file.open("data.txt", fstream::in);							  //считывание предыдущих данных
+	if (!file.is_open())
+		cout << "Ошибка открытие файла!" << endl;
 	else {
-
-		string data;
-		list<Element> positions;									 // создание контейнера для данных в случае успешного открытия файла
 		string getData;
 
-		while (!file.eof()) {										 // цикл будет работать пока не найдет конец считываемого файла
-
+		while (!file.eof()) {										  // цикл будет работать пока не найдет конец считываемого файла
 			getline(file, getData);
-		
-			if (getData == "")										 // если есть пустая строка, не создает отдельный объект под неё
+
+			if (getData == "")									      // если есть пустая строка, не создает отдельный объект под неё
 				continue;
 
 			positions.push_back(getData);
 		}
+	}
+	file.close();
 
+	file.open("data.txt", fstream::out | fstream::app);                // открытие файла с параметрами ввода и
+																	  // добавление в текущие данные, не затирая предыдущие													 
+	if (!file.is_open())											
+		cout << "Ошибка открытие файла!"<<endl;
+	else {
+																	 // создание контейнера для данных в случае успешного открытия файла												 
 		int esc = 0;
+		string data;
 
 		while (!(esc == 5)) {									      // пока пользователь не выберет вариант "5", программа работает
 
@@ -102,11 +107,16 @@ int main() {
 				break;
 
 			case 3:
-				cout << "3" << endl;
+				cout << "Напишите элемент для удаления" << endl;
+				getline(cin, data);
+
+				cout << "Элемент уделен" << endl;
+
 				break;
 
 			case 4:
-				cout << "4" << endl;
+				cout << "Напишите элемент для поиска" << endl;
+				getline(cin, data);
 				break;
 
 			case 5:
