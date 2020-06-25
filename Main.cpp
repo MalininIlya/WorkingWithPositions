@@ -10,12 +10,17 @@ class Element {
 
 public:
 	Element(const string &data) {
-		this->data = data;												// введенные данные вносим в объект класса 
+		this -> data = data;												// введенные данные вносим в объект класса 
 	}
 
-	friend ostream& operator<< (ostream &os, const Element& element) {  // перегрузка оператора дл€ вывода данных на консоль 
+	friend ostream& operator<< (ostream &os, const Element &element) {  // перегрузка оператора дл€ вывода данных на консоль 
 		os << element.data;
 		return os;
+	}
+
+	friend bool operator== (Element& element, const string& data) {  // перегрузка оператора дл€ сравнение объекта класса и вводимых данных 
+		if(element.data == data)
+		return true;
 	}
 
 private:
@@ -51,6 +56,7 @@ int workingFile() {
 	}
 }
 
+
 int main() {
 
 	SetConsoleCP(1251);
@@ -79,14 +85,15 @@ int main() {
 	file.open("data.txt", fstream::out | fstream::app);                // открытие файла с параметрами ввода и
 																	  // добавление в текущие данные, не затира€ предыдущие													 
 	if (!file.is_open())											
-		cout << "ќшибка открытие файла!"<<endl;
+		cout << "ќшибка открытие файла!"<< endl;
 	else {
 																	 // создание контейнера дл€ данных в случае успешного открыти€ файла												 
 		int esc = 0;
 		string data;
+		bool point = false;
 
 		while (!(esc == 5)) {									      // пока пользователь не выберет вариант "5", программа работает
-
+			
 			switch (workingFile())									  // функци€ workingFile() возвращаетс€ целочисленное значение
 			{														  // дл€ последующей обработки введенного значени€ 
 			case 1:
@@ -110,13 +117,26 @@ int main() {
 				cout << "Ќапишите элемент дл€ удалени€" << endl;
 				getline(cin, data);
 
-				cout << "Ёлемент уделен" << endl;
+				cout << "Ёлемент удален" << endl;
 
 				break;
 
-			case 4:
+			case 4:													// поиск по полному тексту позиции
 				cout << "Ќапишите элемент дл€ поиска" << endl;
 				getline(cin, data);
+				
+
+				for (auto it = positions.begin(); it != positions.end();it++) {			
+
+					if ((*it) == data) {
+						cout << "Ёлемент " << data << " найден в списке" << endl << endl;
+						point = true;
+					}
+					else if (it == (--(positions.end())) && point == false) {  // it = предпоследнему элементу и до этого не нашли необходимый элемент
+						cout << "Ёлемент " << data << " не найден в списке" << endl << endl;
+					}
+				}
+				point = false;
 				break;
 
 			case 5:
