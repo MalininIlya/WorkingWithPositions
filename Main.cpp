@@ -27,7 +27,32 @@ private:
 	string data;
 };
 
-int workingFile() {
+list<Element>& reading(list<Element>& positions, int &esc){
+
+	fstream fileRead;
+
+	fileRead.open("data.txt", fstream::in);							  //считывание предыдущих данных
+	if (!fileRead.is_open()) {
+		cout << "Ошибка открытие файла!" << endl;
+		esc = 5;
+	}
+	else {
+		string getData;
+
+		while (!fileRead.eof()) {										  // цикл будет работать пока не найдет конец считываемого файла
+			getline(fileRead, getData);
+
+			if (getData == "")									      // если есть пустая строка, не создает отдельный объект под неё
+				continue;
+
+			positions.push_back(getData);
+		}
+	}
+	fileRead.close();
+	return positions;
+}
+
+int choiceUser() {
 
 	string choice;
 
@@ -35,7 +60,7 @@ int workingFile() {
 	cout << "Нажмите 2 для вывода списка позиций" << endl;
 	cout << "Нажмите 3 для удаление позиции" << endl;
 	cout << "Нажмите 4 для текстового поиска позиции" << endl;
-	cout << "Нажмите 5 для выхода из программы с сохранением данных" << endl << endl;
+	cout << "Нажмите 5 для выхода из программы" << endl << endl;
 
 	getline(cin, choice);
 	cout << endl;
@@ -56,95 +81,92 @@ int workingFile() {
 	}
 }
 
+void workingFile(list<Element>& positions, int &esc) {
+
+	fstream file;
+
+	string data;
+	bool point = false;
+
+	while (!(esc == 5)) {									      // пока пользователь не выберет вариант "5", программа работает
+
+	switch (choiceUser())									  // функция workingFile() возвращается целочисленное значение
+	{														  // для последующей обработки введенного значения 
+	case 1:
+
+		cout << "Введите данные" << endl;
+		getline(cin, data);
+
+		file.open("data.txt", fstream::out | fstream::app);			// открытие файла с параметрами ввода и
+																	 // добавление в текущие данные, не затирая предыдущие
+			file << data + "\n";
+			positions.push_back(data);
+			file.close();
+			cout << "Данные добавлены" << endl << endl;
+		break;
+
+	case 2:
+		for (auto elem : positions) 				          // вывод всех елементов контейнера на данный момент				
+			cout << elem << endl;
+
+		cout << endl;
+		break;
+
+	case 3:
+		cout << "Напишите элемент для удаления" << endl;
+		getline(cin, data);
+
+		file.open("data.txt", fstream::out);
+
+		for (auto it = positions.begin(); it != positions.end(); it++) {
+
+			if ((*it) == data) {
+
+				positions.erase(it);
+				cout << "Элемент " << data << " удален" << endl << endl;
+
+				for (auto elem : positions)
+				file << elem << endl;
+					
+				break;
+			}
+		}
+		file.close();
+		break;
+
+	case 4:
+		cout << "Напишите элемент для поиска" << endl;   // поиск по полному тексту позиции
+		getline(cin, data);
+
+		for (auto it = positions.begin(); it != positions.end(); it++) {
+
+			if ((*it) == data) {
+				cout << "Элемент " << data << " найден в списке" << endl << endl;
+				point = true;
+			}
+			else if (it == (--(positions.end())) && point == false) {  // Если it == последнему элементу list и до этого не нашли необходимый элемент
+				cout << "Элемент " << data << " не найден в списке" << endl << endl;
+			}
+		}
+		point = false;
+		break;
+	case 5:
+		esc = 5;
+		break;
+		}
+	}
+}
+
 
 int main() {
 
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 
-	fstream file;
+	int esc = 0;
 	list<Element> positions;
+	reading(positions, esc);
+	workingFile(positions, esc);
 
-	file.open("data.txt", fstream::in);							  //считывание предыдущих данных
-	if (!file.is_open())
-		cout << "Ошибка открытие файла!" << endl;
-	else {
-		string getData;
-
-		while (!file.eof()) {										  // цикл будет работать пока не найдет конец считываемого файла
-			getline(file, getData);
-
-			if (getData == "")									      // если есть пустая строка, не создает отдельный объект под неё
-				continue;
-
-			positions.push_back(getData);
-		}
-	}
-	file.close();
-
-	file.open("data.txt", fstream::out | fstream::app);                // открытие файла с параметрами ввода и
-																	  // добавление в текущие данные, не затирая предыдущие													 
-	if (!file.is_open())											
-		cout << "Ошибка открытие файла!"<< endl;
-	else {
-																	 // создание контейнера для данных в случае успешного открытия файла												 
-		int esc = 0;
-		string data;
-		bool point = false;
-
-		while (!(esc == 5)) {									      // пока пользователь не выберет вариант "5", программа работает
-			
-			switch (workingFile())									  // функция workingFile() возвращается целочисленное значение
-			{														  // для последующей обработки введенного значения 
-			case 1:
-				cout << "Введите данные" << endl;
-				getline(cin, data);
-
-				file << data + "\n";								  // сохранение данных в файл будет выполнено после выхода из программы
-				positions.push_back(data);
-
-				cout << "Данные добавлены" << endl << endl;
-				break;
-
-			case 2:
-				for (auto elem : positions) 				          // вывод всех елементов контейнера на данный момент				
-					cout << elem << endl;
-
-				cout << endl;
-				break;
-
-			case 3:
-				cout << "Напишите элемент для удаления" << endl;
-				getline(cin, data);
-
-				cout << "Элемент удален" << endl;
-
-				break;
-
-			case 4:													// поиск по полному тексту позиции
-				cout << "Напишите элемент для поиска" << endl;
-				getline(cin, data);
-				
-
-				for (auto it = positions.begin(); it != positions.end();it++) {			
-
-					if ((*it) == data) {
-						cout << "Элемент " << data << " найден в списке" << endl << endl;
-						point = true;
-					}
-					else if (it == (--(positions.end())) && point == false) {  // it = предпоследнему элементу и до этого не нашли необходимый элемент
-						cout << "Элемент " << data << " не найден в списке" << endl << endl;
-					}
-				}
-				point = false;
-				break;
-
-			case 5:
-				esc = 5;
-				break;
-			}
-		}
-	}
-	file.close();
 	return 0;
 }
