@@ -10,7 +10,8 @@ class Element {
 
 public:
 	Element(const string &data) {
-		this -> data = data;												// введенные данные вносим в объект класса 
+		this -> data = data;												// введенные данные вносим в объект класса
+		
 	}
 
 	friend ostream& operator<< (ostream &os, const Element &element) {  // перегрузка оператора для вывода данных на консоль 
@@ -86,11 +87,12 @@ void workingFile(list<Element>& positions, int &esc) {
 	fstream file;
 
 	string data;
-	bool point = false;
+	bool point = false;                                        // переменая для проверки элемента в списке
+	int index = 1;                                             
 
 	while (!(esc == 5)) {									      // пока пользователь не выберет вариант "5", программа работает
 
-	switch (choiceUser())									  // функция workingFile() возвращается целочисленное значение
+	switch (choiceUser())									  // функция choiceUser() возвращается целочисленное значение
 	{														  // для последующей обработки введенного значения 
 	case 1:
 
@@ -99,39 +101,50 @@ void workingFile(list<Element>& positions, int &esc) {
 
 		file.open("data.txt", fstream::out | fstream::app);			// открытие файла с параметрами ввода и
 																	 // добавление в текущие данные, не затирая предыдущие
-			file << data + "\n";
-			positions.push_back(data);
+			file << data + "\n";									//запись данных в файл
+			positions.push_back(data);								// добавление нового объекта в list
 			file.close();
 			cout << "Данные добавлены" << endl << endl;
 		break;
 
 	case 2:
-		for (auto elem : positions) 				          // вывод всех елементов контейнера на данный момент				
-			cout << elem << endl;
+		cout << "Список позиций" << endl;
+		for (auto elem : positions)			          // вывод всех элементов контейнера на данный момент				
+			cout << index++ <<". "<< elem << endl;
 
 		cout << endl;
+		index = 1;
 		break;
 
 	case 3:
-		cout << "Напишите элемент для удаления" << endl;
+		cout << "Напишите элемент или его номер для удаления" << endl;
 		getline(cin, data);
 
 		file.open("data.txt", fstream::out);
 
 		for (auto it = positions.begin(); it != positions.end(); it++) {
 
-			if ((*it) == data) {
+			string strIndex = to_string(index);										// преобразование int в string 
+			pair<string, Element> pos(strIndex, *it);                               // создание контейнера с преобразованной строкой и элементом коллекции
+			
+			if ((*it) == data || pos.first == data) {                   // проверка преобразованной строки со строкой, введенной пользователем или с данными из коллекции
 
 				positions.erase(it);
 				cout << "Элемент " << data << " удален" << endl << endl;
 
-				for (auto elem : positions)
-				file << elem << endl;
-					
+				for (auto elem : positions)                          // после удаления записываем новые данные в файл
+					file << elem << endl;
+
 				break;
 			}
+			else if (it == (--(positions.end())) && point == false) {  // Если it == последнему элементу list и до этого не нашли необходимый элемент
+				cout << "Элемент " << data << " не найден в списке" << endl << endl;
+			}
+			index++;                                                  // увеличение index для проверки следующего элемента в коллекции
 		}
 		file.close();
+		index = 1;                                                   // после выполнения возвращаем index в начальное состояние
+		point = false;
 		break;
 
 	case 4:
@@ -150,6 +163,7 @@ void workingFile(list<Element>& positions, int &esc) {
 		}
 		point = false;
 		break;
+
 	case 5:
 		esc = 5;
 		break;
