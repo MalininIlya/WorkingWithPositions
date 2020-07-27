@@ -132,9 +132,6 @@ void workingFile(list<Element>& positions, int &esc) {
 				positions.erase(it);
 				cout << "Элемент " << data << " удален" << endl << endl;
 
-				for (auto elem : positions)                          // после удаления записываем новые данные в файл
-					file << elem << endl;
-
 				break;
 			}
 			else if (it == (--(positions.end())) && point == false) {  // Если it == последнему элементу list и до этого не нашли необходимый элемент
@@ -142,6 +139,10 @@ void workingFile(list<Element>& positions, int &esc) {
 			}
 			index++;                                                  // увеличение index для проверки следующего элемента в коллекции
 		}
+
+		for (auto elem : positions)                          // после удаления записываем новые данные в файл
+			file << elem << endl;
+
 		file.close();
 		index = 1;                                                   // после выполнения возвращаем index в начальное состояние
 		point = false;
